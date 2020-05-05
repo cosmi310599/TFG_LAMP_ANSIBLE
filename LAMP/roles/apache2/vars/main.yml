@@ -1,0 +1,13 @@
+---
+- hosts: cliente
+  sudo: yes
+  vars:
+    puerto_http: 80
+    puerto_https: 443
+    dominio: cesa.com
+    servicio_apache: httpd
+    status_apache: restarted 
+  tasks:
+    - name: Instalar apache web server 
+
+...

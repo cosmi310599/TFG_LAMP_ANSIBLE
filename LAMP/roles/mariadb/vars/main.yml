@@ -1,0 +1,17 @@
+---
+- hosts: clientes
+  sudo: yes
+  vars:
+    mysql_bdd: saludo
+    mysql_usu: admin_1
+    mysql_password: "Admin12345"
+    mysql_pivi: '*.*:ALL'
+    dominio: cesa.com
+    mysql_root_passwd: root
+  tasks:
+    - name: Instalar mysql
+... 
+
+
+#Este fichero al tener una variable que contiene la contraseña lo voy a cifrar con el comando 
+# ansible-vault encrypt 

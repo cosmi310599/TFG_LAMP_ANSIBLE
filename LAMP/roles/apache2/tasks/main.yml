@@ -1,0 +1,125 @@
+- name: Instalar apache web server 
+  become: yes 
+  tasks:
+    - name: Instalación paquetes necesarios MariaDB
+      become: true
+      apt: pkg= {{ item }} state=installed update_cache=true
+      with_items:
+        - apache2
+        - php
+        - libapache2-mod-php
+        - php-mycript 
+          
+# PHP-MYCRIPT --> Esta extension es un reemplazo para el comando crypt de unix, es un medio para encriptar 
+#archivos de linux
+
+#Es necesario el modulo de apache2 --> Habilita o deshabilita un módulo específico del servidor web Apache2
+#https://docs.ansible.com/ansible/latest/modules/apache2_module_module.html 
+#Usando este modulo, usamos un controlador de tareas para reiniciar apache2 
+
+    - name: Configurar firewall
+      raw: ufw allow 'WWW full' 
+      #SUJETO A CAMBIOS, de momento habilito ambos puertos 80 y 443
+
+
+    - name: Habilitar apache 
+      apache2_module: name=rewrite state=present 
+      notify: 
+         - Restart apache2 
+    #Necesitamos reiniciar apache2 despues de que el modulo 
+    #este habilitado. 
+
+    #Habilitamos el servicio para que se cargue al inicio 
+    - name: Habilitar servicio ansible
+      service:
+        name: httpd
+        enabled: yes
+    
+    #TENGO DUDA DE COMO ESCRIBIR LAS VARIABLES, SI CON COMILLAS O SIN
+    - name: Crear estructura directorio raiz
+      file: /var/www/{{ dominio }}/html
+      state: directory
+      mode: '0755'
+    
+    - name: Asignar permisos al usuario root
+      shell: chown -R $USER:$USER /var/www/{{ dominio }}/html
+
+    #Configuración del virtualhost + backup 
+    - name: Crear archivo del virtualhost
+      template:
+        src: 000-default-cesa.conf 
+        dest: /etc/apache2/sites-available/{{ dominio }}.conf
+        backup: yes
+        
+    - name: Eliminar el index.html por defecto de apache
+      ignore_errors: yes
+      command: rm /var/www/{{ dominio }}/html/index.html 
+
+    - name: Copiar el fichero php
+      copy: 
+        src: index.php
+        dest: /var/www/{{ dominio}}/html/
+        mode: '0664'
+
+
+    - name: Configuración ports.conf
+    #Por defecto escucha por el puerto 80 asi que vamos a añadir el puerto seguro
+      lineinfile: 
+        dest: /etc/apache2/ports.conf
+        regexp: "^Listen "
+        line: "Listen {{ puerto_https }}" 
+    #REVISAR si hace falta hanlder para reiniciar servicio   
+        
+    - name: Habilitar cambios 
+      command: a2ensite {{ dominio }}
+      args:
+        creates: /etc/apache2/sites-enabled/{{ dominio }}.conf
+      notify:
+       - restart apache2 
+    
+    - name: Deshabilitar plantilla por defecto
+      command: a2dissite 000-default.conf
+
+    - name: Generar llave y cert
+      shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/llave-apache.key -out /etc/ssl/certs/certificado-apache.crt -subj "/C=ES/ST=Madrid/O=Cesa.com/Email=admin@cesa.com" 
+
+    - name: Habilitar modulo ssl
+      apache2_module: 
+        name: ssl
+        state: present
+      notify:
+        - restart apache2 
+
+    #Vamos a crear un fragmento de configuración de apache con ajustes de cifrado seguro 
+    #dentro de /etc/apache2/conf-available creamos un archivo que se llame ssl-params.conf
+    - name: Crear ssl-params.conf
+      template:
+        src: ssl-params.conf
+        dest: /etc/apache2/conf-available/
+        #backup: yes
+      
+    - mame: Copia de seguridad de default-ssl.conf
+      command: cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/backup_default-ssl.conf
+
+    - name: Creación del archivo de configuración de SSL 
+      template:
+        src: default-ssl.conf
+        dest: /etc/apache2/sites-available/
+
+    - name: Habilitar ssl-params.conf
+      command: a2enconf ssl-params
+
+    - name: Habilitar cambios apache
+      command: a2enmod {{ item[0] }} 
+      with_nested:
+        - [ 'ssl', 'headers' ]
+
+    - name: Habilitar host virtual SSL
+      command: a2ensite default-ssl
+   
+  notify:
+    - restart apache2
+
+
+#OTRA DUDA QUE TENGO: es si los ficheros como el index o el  000-default.conf tienen que ir con la extensión j2
+

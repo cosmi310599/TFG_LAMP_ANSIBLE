@@ -1,0 +1,4 @@
+- name: Reseterar php
+  service: 
+     name: php7.0-fpm 
+     state: restarted

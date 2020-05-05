@@ -1,0 +1,68 @@
+- name: Instalar mysql
+  tasks:
+    - name: Instalación paquetes necesarios MariaDB
+      become: true
+      package: 
+        - name: '{{ item[0] }}'
+        - state: '{{ item.[1] }}'
+      with_nested:
+        - [ 'mariadb-server', 'python-mysqldb','libmysqlclient-dev','php-mysql']
+        - [ 'present']
+      debug:
+      msg: 'Instalación realizada con éxito'
+
+    - name: Iniciar servicio MySQL y habilitarlo
+      service:
+        name: mariadb
+        state: started
+        enable: true 
+
+    - name: Crear base de datos
+      mysql_db: 
+        name: {{ mysql_bdd }}
+        state: present
+
+    - name: Config usuario root
+      mysql_user:
+        login_user: root
+        login_password: "{{ mysql_root_passwd }}"
+        user: root
+        check_implicit_admin: true 
+        password: "{{ mysql_root_passwd }}"
+        host: localhost
+      
+    - name: Crear usuario con privilegios
+      mysql_user:
+        name: {{ mysql_usu }}
+        password:  {{ mysql_password}}
+        priv:  {{ mysql_privi}}
+        hosts: localhost
+        state: present
+
+    - name: Copiar datos bdd
+      copy: src=bdd.sql dest=/tmp/bdd.sql
+
+    - name: Insertar los datos de ejemplo 
+      shell: cat /tmp/bdd.sql | mysql -u {{ usu_gbd }} -p {{contraseña_usu}}
+
+    - name: Instalar script de php con conexión a base de datos.
+      copy:
+       src: conexion.php
+       dest: /var/www/{{ dominio }}/html/
+       mode: '0664'
+
+
+    - name: Instalar script php consulta base de datos
+      copy:
+       src: consulta.php
+       dest: /var/www/{{ dominio }}/html/
+       mode: '0644'
+       
+  #resetear apache cuando se hayan cargado los archivos
+  notify:
+    - restart apache2
+
+
+
+
+  

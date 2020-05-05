@@ -1,0 +1,15 @@
+- name: Instalar php + extensiones 
+  become: true
+  apt: pkg={{ item }} state=installed update_cache=true
+  with_items:
+  - php 
+  - php-mysql
+
+- name: Configurar php con apache2
+  become: true
+  copy: src=www.conf dest=/etc/php/7.0/fpm/pool.d/
+  notify:
+    - restart php
+
+
+
