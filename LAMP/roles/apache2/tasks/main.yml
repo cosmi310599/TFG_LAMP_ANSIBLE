@@ -84,6 +84,8 @@
      src: 000-default.conf.j2 
      dest: /etc/apache2/sites-available/{{ dominio }}.conf
      backup: yes
+  notify:
+   - Reload apache2
 
 - name: Copiar fichero conf principal
   template:
