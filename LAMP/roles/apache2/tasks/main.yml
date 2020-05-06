@@ -68,64 +68,64 @@
            
       - name: Asignar permisos al usuario root
         shell: chown -R $USER:$USER /var/www/{{ dominio }}/html
-
-     #Configuración del virtualhost + backup 
-     - name: Crear archivo del virtualhost
-       template:
-         src: 000-default-cesa.conf 
-         dest: /etc/apache2/sites-available/{{ dominio }}.conf
-         backup: yes
+   
+      #Configuración del virtualhost + backup 
+      - name: Crear archivo del virtualhost
+        template:
+          src: 000-default-cesa.conf 
+          dest: /etc/apache2/sites-available/{{ dominio }}.conf
+          backup: yes
         
-     - name: Eliminar el index.html por defecto de apache
-       ignore_errors: yes
-       command: rm /var/www/{{ dominio }}/html/index.html 
+      - name: Eliminar el index.html por defecto de apache
+        ignore_errors: yes
+        command: rm /var/www/{{ dominio }}/html/index.html 
 
-     - name: Copiar el fichero php
-       copy: 
-         src: index.php
-         dest: /var/www/{{ dominio}}/html/
-         mode: '0664'
+      - name: Copiar el fichero php
+        copy: 
+          src: index.php
+          dest: /var/www/{{ dominio}}/html/
+          mode: '0664'
         
-     - name: Habilitar cambios 
-       command: a2ensite {{ dominio }}
-       args:
-         creates: /etc/apache2/sites-enabled/{{ dominio }}.conf
-       notify:
-        - restart apache2 
+      - name: Habilitar cambios 
+        command: a2ensite {{ dominio }}
+        args:
+          creates: /etc/apache2/sites-enabled/{{ dominio }}.conf
+        notify:
+         - restart apache2 
     
-     - name: Deshabilitar plantilla por defecto
-       command: a2dissite 000-default.conf
+      - name: Deshabilitar plantilla por defecto
+        command: a2dissite 000-default.conf
 
 
       #Vamos a crear un fragmento de configuración de apache con ajustes de cifrado seguro 
       #dentro de /etc/apache2/conf-available creamos un archivo que se llame ssl-params.conf
-     - name: Crear ssl-params.conf
-       template:
-         src: ssl-params.conf
-         dest: /etc/apache2/conf-available/
-         #backup: yes
+      - name: Crear ssl-params.conf
+        template:
+          src: ssl-params.conf
+          dest: /etc/apache2/conf-available/
+          #backup: yes
       
-     - mame: Copia de seguridad de default-ssl.conf
-       command: cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/backup_default-ssl.conf
+      - name: Copia de seguridad de default-ssl.conf
+        command: cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/backup_default-ssl.conf
 
-     - name: Creación del archivo de configuración de SSL 
-       template:
-         src: default-ssl.conf
-         dest: /etc/apache2/sites-available/
+      - name: Creación del archivo de configuración de SSL 
+        template:
+          src: default-ssl.conf
+          dest: /etc/apache2/sites-available/
 
-     - name: Habilitar ssl-params.conf
-       command: a2enconf ssl-params
+      - name: Habilitar ssl-params.conf
+        command: a2enconf ssl-params
 
-     - name: Habilitar cambios apache
-       command: a2enmod {{ item[0] }} 
-       with_nested:
-         - [ 'ssl', 'headers' ]
+      - name: Habilitar cambios apache
+        command: a2enmod {{ item[0] }} 
+        with_nested:
+          - [ 'ssl', 'headers' ]
 
-     - name: Habilitar host virtual SSL
-       command: a2ensite default-ssl
-   
-  notify:
-    - restart apache2
+      - name: Habilitar host virtual SSL
+        command: a2ensite default-ssl
+
+  #notify:
+    #- restart apache2
 
 
 #OTRA DUDA QUE TENGO: es si los ficheros como el index o el  000-default.conf tienen que ir con la extensión j2
