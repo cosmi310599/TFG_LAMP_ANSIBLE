@@ -1,132 +1,133 @@
-- name: Instalar apache web server 
-  become: yes 
-  tasks:
-      - name: Instalar apache
-        package: name="{{ item[0] }}" state="{{ item[1] }}"
-        with_nested:
-          - [ 'apache2', 'php','libapache2-mod-php' ]
-          - [ 'present']
-            # controlar --> no instala php-mcrypt
-            # poner mensaje debug en caso de error 
+- name: Instalación paquetes necesarios
+  package: name="{{ item[0] }}" state="{{ item[1] }}"
+  with_nested:
+    - [ 'ufw', 'apache2', 'php', 'libapache2-mod-php', 'php-mcrypt' ]
+    - [ 'present']
 
-          
+# poner mensaje debug en caso de error 
+        
 # PHP-MYCRIPT --> Esta extension es un reemplazo para el comando crypt de unix, es un medio para encriptar 
 #archivos de linux
+
+- name: Habilitar firewall
+  ufw:
+    state: enabled
+
+- name: Habilitar reglas firewall | SSH | HTTP | HTTPS
+  ufw:
+    rule: '{{ item[0] }}'
+    port: '{{ item[1] }}'
+    proto: '{{ item[2] }}'
+  with_nested:
+    - [ 'allow' ]
+    - [ 22, 80, 443 ]
+    - [ 'tcp' ]
+
 
 #Es necesario el modulo de apache2 --> Habilita o deshabilita un módulo específico del servidor web Apache2
 #https://docs.ansible.com/ansible/latest/modules/apache2_module_module.html 
 #Usando este modulo, usamos un controlador de tareas para reiniciar apache2 
 
-      - name: Habilitar firewall y reglas
-        raw: ufw enable 
-        raw: ufw allow {{ item }} 
-        with_items: 
-          - ssh
-          - 22/tcp
-          - http
-          - 80/tcp
-          - https 
-          - 443/tcp
-
-      - name: Habilitar modulo apache 
-        apache2_module: name=rewrite state=present
-        notify: 
-         - Restart apache2 
-        #Necesitamos reiniciar apache2 despues de que el modulo este habilitado. 
-  
-      - name: Habilitar modulo ssl 
-        apache2_module: 
-          name: ssl 
-          state: present
-        notify:
-          - restart apache2
-  
-      - name: Habilitar servicio apache 
-        service:
-          name: apache2
-          enabled: yes
-
-      - name: Configuración ports.conf
-        lineinfile:
-          dest: /etc/apache2/ports.conf
-          regexp: "^Listen "
-          line: "Listen 443"
-        # ver por que sustituye la linea en vez de añadirla
- 
-      - name: Deshabilitar plantilla por defecto
-        command: a2dissite 000-default.conf
-
-      - name: Generar llave y cert 
-        shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/llave-apache.key -out /etc/ssl/certs/certificado-apache.crt -subj "/C=ES/ST=Madrid/O=Cesa.com/Email=admin@cesa.com" 
-
-      #TENGO DUDA DE COMO ESCRIBIR LAS VARIABLES, SI CON COMILLAS O SIN 
-      - name: Crear estructura directorio raiz
-        file: 
-           path: /var/www/{{ dominio }}/html
-           state: directory
-           mode: '0755'
-           
-      - name: Asignar permisos al usuario root
-        shell: chown -R $USER:$USER /var/www/{{ dominio }}/html
-   
-      #Configuración del virtualhost + backup 
-      - name: Crear archivo del virtualhost
-        template:
-          src: 000-default-cesa.conf 
-          dest: /etc/apache2/sites-available/{{ dominio }}.conf
-          backup: yes
-        
-      - name: Eliminar el index.html por defecto de apache
-        ignore_errors: yes
-        command: rm /var/www/{{ dominio }}/html/index.html 
-
-      - name: Copiar el fichero php
-        copy: 
-          src: index.php
-          dest: /var/www/{{ dominio}}/html/
-          mode: '0664'
-        
-      - name: Habilitar cambios 
-        command: a2ensite {{ dominio }}
-        args:
-          creates: /etc/apache2/sites-enabled/{{ dominio }}.conf
-        notify:
-         - restart apache2 
+- name: Habilitar modulo apache2
+  apache2_module: name=rewrite state=present
+  notify: 
+    - Restart apache2 
     
-      - name: Deshabilitar plantilla por defecto
-        command: a2dissite 000-default.conf
+-  name: Habilitar modulo SSL
+   apache2_module: 
+     name: ssl 
+     state: present
+   notify:
+     - Restart apache2
+ 
+- name: Habilitar servicio apache 
+  service:
+    name: apache2
+    enabled: yes
+
+- name: Configuración ports.conf
+  lineinfile:
+    dest: /etc/apache2/ports.conf
+    regexp: "^Listen "
+    line: "Listen 443"
+
+- name: Configuracion hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ ip_cliente }}		cesa.com"
+ 
+- name: Generar llave y cert 
+  shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/llave-apache.key -out /etc/ssl/certs/certificado-apache.crt -subj "/C=ES/ST=Madrid/O=Cesa.com/Email=admin@cesa.com" 
+
+#Revisar si las variables van con comillas o no hace falta 
+
+- name: Crear estructura directorio raiz
+  file: 
+     path: /var/www/{{ dominio }}/public_html
+     state: directory
+     mode: '0755'
+           
+- name: Asignar permisos al usuario root
+  shell: chown -R $USER:$USER /var/www/{{ dominio }}/public_html
+   
+
+- name: Copiar  index
+  copy:
+    src: index.php
+    dest: /var/www/{{ dominio }}/public_html/
+    mode: '0664'
+
+#Configuración del virtualhost + backup 
+
+- name: Crear archivo del virtualhost
+  template:
+     src: 000-default.conf.j2 
+     dest: /etc/apache2/sites-available/{{ dominio }}.conf
+     backup: yes
+
+- name: Copiar fichero conf principal
+  template:
+     src: apache2.conf.j2
+     dest: /etc/apache2/apache2.conf
+     backup: yes 
+        
+- name: Habilitar cambios 
+  command: a2ensite {{ dominio }}
+  notify:
+  - Restart apache2 
+    
+#Vamos a crear un fragmento de configuración de apache con ajustes de cifrado seguro 
+#dentro de /etc/apache2/conf-available creamos un archivo que se llame ssl-params.conf
+
+- name: Crear ssl-params.conf
+  copy:
+   src: ssl-params.conf.j2
+   dest: /etc/apache2/conf-available/ssl-params.conf
+     
+#He modificado las directivas asi que de momento esto se queda en deshuso     
+#- name: Creación del archivo de configuración de SSL 
+  #template:
+    #src: default-ssl.conf.j2
+    #dest: /etc/apache2/sites-available/default-ssl.conf
+
+- name: Habilitar cambios apache | SSL 
+  apache2_module: name=ssl state=present
+  notify:
+   - Restart apache2
+
+- name: Habilitar cambios apache | Headers 
+  apache2_module: name=headers state=present
+  notify:
+   - Restart apache2
+
+#- name: Habilitar host virtual SSL
+# command: a2ensite default-ssl
+
+- name: Habilitar ssl-params 
+  command: a2enconf ssl-params
+  notify:
+   - Restart apache2
 
 
-      #Vamos a crear un fragmento de configuración de apache con ajustes de cifrado seguro 
-      #dentro de /etc/apache2/conf-available creamos un archivo que se llame ssl-params.conf
-      - name: Crear ssl-params.conf
-        template:
-          src: ssl-params.conf
-          dest: /etc/apache2/conf-available/
-          #backup: yes
-      
-      - name: Copia de seguridad de default-ssl.conf
-        command: cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/backup_default-ssl.conf
 
-      - name: Creación del archivo de configuración de SSL 
-        template:
-          src: default-ssl.conf
-          dest: /etc/apache2/sites-available/
-
-      - name: Habilitar ssl-params.conf
-        command: a2enconf ssl-params
-
-      - name: Habilitar cambios apache
-        command: a2enmod {{ item[0] }} 
-        with_nested:
-          - [ 'ssl', 'headers' ]
-
-      - name: Habilitar host virtual SSL
-        command: a2ensite default-ssl
-
-  #notify:
-    #- restart apache2
-
-
-#OTRA DUDA QUE TENGO: es si los ficheros como el index o el  000-default.conf tienen que ir con la extensión j2
 
