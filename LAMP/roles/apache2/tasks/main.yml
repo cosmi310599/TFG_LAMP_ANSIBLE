@@ -17,10 +17,16 @@
 #https://docs.ansible.com/ansible/latest/modules/apache2_module_module.html 
 #Usando este modulo, usamos un controlador de tareas para reiniciar apache2 
 
-    - name: Configurar firewall
-      raw: ufw allow 'WWW full' 
-      #SUJETO A CAMBIOS, de momento habilito ambos puertos 80 y 443
-
+     - name: Habilitar firewall y reglas
+        raw: ufw enable
+        raw: ufw allow {{ item }}
+        with_items:
+          - ssh
+          - 22/tcp
+          - http
+          - 80/tcp
+          - https
+          - 443/tcp
 
     - name: Habilitar apache 
       apache2_module: name=rewrite state=present 
@@ -30,9 +36,9 @@
     #este habilitado. 
 
     #Habilitamos el servicio para que se cargue al inicio 
-    - name: Habilitar servicio ansible
+    - name: Habilitar servicio apache
       service:
-        name: httpd
+        name: apache2
         enabled: yes
     
     #TENGO DUDA DE COMO ESCRIBIR LAS VARIABLES, SI CON COMILLAS O SIN
@@ -68,7 +74,8 @@
         dest: /etc/apache2/ports.conf
         regexp: "^Listen "
         line: "Listen {{ puerto_https }}" 
-    #REVISAR si hace falta hanlder para reiniciar servicio   
+    #REVISAR porque sustituye la línea en vez de añadira 
+   
         
     - name: Habilitar cambios 
       command: a2ensite {{ dominio }}
