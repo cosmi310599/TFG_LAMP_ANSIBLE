@@ -4,7 +4,7 @@
       become: true
       package: 
         - name: '{{ item[0] }}'
-        - state: '{{ item.[1] }}'
+        - state: '{{ item[1] }}'
       with_nested:
         - [ 'mariadb-server', 'python-mysqldb','libmysqlclient-dev','php-mysql']
         - [ 'present']
