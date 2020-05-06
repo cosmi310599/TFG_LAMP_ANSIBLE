@@ -1,15 +1,10 @@
 ---
-- hosts: clientes
-  sudo: yes
-  vars:
-    mysql_bdd: saludo
-    mysql_usu: admin_1
-    mysql_password: "Admin12345"
-    mysql_pivi: '*.*:ALL'
-    dominio: cesa.com
-    mysql_root_passwd: root
-  tasks:
-    - name: Instalar mysql
+mysql_bdd: saludo
+mysql_usu: admin_1
+mysql_password: "Admin12345"
+mysql_pivi: '*.*:ALL'
+dominio: cesa.com
+mysql_root_passwd: root
 ... 
 
 
