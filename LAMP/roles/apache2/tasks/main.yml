@@ -1,7 +1,7 @@
 - name: Instalar apache web server 
   become: yes 
   tasks:
-    - name: Instalación paquetes necesarios MariaDB
+    - name: Instalación paquetes necesarios Apache2
       become: true
       apt: pkg= {{ item }} state=installed update_cache=true
       with_items:
