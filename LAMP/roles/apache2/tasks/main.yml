@@ -1,14 +1,14 @@
 - name: Instalar apache web server 
   become: yes 
   tasks:
-    - name: Instalación paquetes necesarios Apache2
-      become: true
-      apt: pkg= {{ item }} state=installed update_cache=true
-      with_items:
-        - apache2
-        - php
-        - libapache2-mod-php
-        - php-mycript 
+      - name: Instalar apache
+        package: name="{{ item[0] }}" state="{{ item[1] }}"
+        with_nested:
+          - [ 'apache2', 'php','libapache2-mod-php' ]
+          - [ 'present']
+            # controlar --> no instala php-mcrypt
+            # poner mensaje debug en caso de error 
+
           
 # PHP-MYCRIPT --> Esta extension es un reemplazo para el comando crypt de unix, es un medio para encriptar 
 #archivos de linux
