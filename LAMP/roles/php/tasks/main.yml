@@ -4,12 +4,16 @@
   with_items:
   - php 
   - php-mysql
+  - libapache2-mod-php
 
 - name: Configurar php con apache2
   become: true
   copy: src=www.conf dest=/etc/php/7.0/fpm/pool.d/
   notify:
-    - restart php
+    - Restart 
+
+#FALTA CONFIGURAR WWW.CONF Y CONTROLAR POSIBLES ERRORES
+
 
 
 
