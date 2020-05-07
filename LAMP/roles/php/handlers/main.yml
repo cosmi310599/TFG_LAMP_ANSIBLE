@@ -1,4 +1,4 @@
-- name: Reseterar php
+- name: Restart 
   service: 
-     name: php7.0-fpm 
+     name: apache2 
      state: restarted
