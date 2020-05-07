@@ -1,0 +1,3 @@
+Para darle una mayor utilidad al servidor he creado un formulario donde se guardará la información introducida 
+en la base de datos.
+De momento no esta implantado porque faltan ficheros y crear la base de datos.
