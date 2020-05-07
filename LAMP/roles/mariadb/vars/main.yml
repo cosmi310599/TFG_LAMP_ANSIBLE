@@ -2,11 +2,9 @@
 mysql_bdd: saludo
 mysql_usu: admin_1
 mysql_password: "Admin12345"
-mysql_pivi: '*.*:ALL'
 dominio: cesa.com
-mysql_root_passwd: root
 ... 
 
 
-#Este fichero al tener una variable que contiene la contraseña lo voy a cifrar con el comando 
-# ansible-vault encrypt 
+#Este fichero al tener una variable que contiene la contraseña lo voy a cifrar con el comando
+# ansible-vault encrypt
