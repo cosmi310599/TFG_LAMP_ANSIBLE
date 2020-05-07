@@ -1,13 +1,18 @@
 - name: Instalación paquetes necesarios
   package: name="{{ item[0] }}" state="{{ item[1] }}"
   with_nested:
-    - [ 'ufw', 'apache2', 'php', 'libapache2-mod-php', 'php-mcrypt' ]
+    - [ 'ufw', 'apache2', 'php', 'libapache2-mod-php', 'php-mcrypt', 'curl' ]
     - [ 'present']
 
 # poner mensaje debug en caso de error 
-        
+
+          
 # PHP-MYCRIPT --> Esta extension es un reemplazo para el comando crypt de unix, es un medio para encriptar 
 #archivos de linux
+
+#Es necesario el modulo de apache2 --> Habilita o deshabilita un módulo específico del servidor web Apache2
+#https://docs.ansible.com/ansible/latest/modules/apache2_module_module.html 
+#Usando este modulo, usamos un controlador de tareas para reiniciar apache2 
 
 - name: Habilitar firewall
   ufw:
@@ -24,16 +29,14 @@
     - [ 'tcp' ]
 
 
-#Es necesario el modulo de apache2 --> Habilita o deshabilita un módulo específico del servidor web Apache2
-#https://docs.ansible.com/ansible/latest/modules/apache2_module_module.html 
-#Usando este modulo, usamos un controlador de tareas para reiniciar apache2 
-
-- name: Habilitar modulo apache2
+- name: Habilitar modulo
   apache2_module: name=rewrite state=present
   notify: 
     - Restart apache2 
-    
--  name: Habilitar modulo SSL
+        
+#Necesitamos reiniciar apache2 despues de que el modulo este habilitado. 
+  
+-  name: Habilitar modulo ssl 
    apache2_module: 
      name: ssl 
      state: present
@@ -54,12 +57,14 @@
 - name: Configuracion hosts
   lineinfile:
     dest: /etc/hosts
-    line: "{{ ip_cliente }}		cesa.com"
+    line: "{{ ip_cliente }}	cesa.com"
+
+# ver por que sustituye la linea en vez de añadirla
  
 - name: Generar llave y cert 
   shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/llave-apache.key -out /etc/ssl/certs/certificado-apache.crt -subj "/C=ES/ST=Madrid/O=Cesa.com/Email=admin@cesa.com" 
 
-#Revisar si las variables van con comillas o no hace falta 
+#TENGO DUDA DE COMO ESCRIBIR LAS VARIABLES, SI CON COMILLAS O SIN 
 
 - name: Crear estructura directorio raiz
   file: 
@@ -69,23 +74,18 @@
            
 - name: Asignar permisos al usuario root
   shell: chown -R $USER:$USER /var/www/{{ dominio }}/public_html
+
+- name: Curl
+  raw: curl http://{{ dominio }}
+  
    
-
-- name: Copiar  index
-  copy:
-    src: index.php
-    dest: /var/www/{{ dominio }}/public_html/
-    mode: '0664'
-
 #Configuración del virtualhost + backup 
-
 - name: Crear archivo del virtualhost
   template:
      src: 000-default.conf.j2 
      dest: /etc/apache2/sites-available/{{ dominio }}.conf
      backup: yes
-  notify:
-   - Reload apache2
+
 
 - name: Copiar fichero conf principal
   template:
@@ -97,6 +97,7 @@
   command: a2ensite {{ dominio }}
   notify:
   - Restart apache2 
+#Revisar args 
     
 #Vamos a crear un fragmento de configuración de apache con ajustes de cifrado seguro 
 #dentro de /etc/apache2/conf-available creamos un archivo que se llame ssl-params.conf
@@ -106,12 +107,7 @@
    src: ssl-params.conf.j2
    dest: /etc/apache2/conf-available/ssl-params.conf
      
-#He modificado las directivas asi que de momento esto se queda en deshuso     
-#- name: Creación del archivo de configuración de SSL 
-  #template:
-    #src: default-ssl.conf.j2
-    #dest: /etc/apache2/sites-available/default-ssl.conf
-
+     
 - name: Habilitar cambios apache | SSL 
   apache2_module: name=ssl state=present
   notify:
@@ -122,14 +118,10 @@
   notify:
    - Restart apache2
 
-#- name: Habilitar host virtual SSL
-# command: a2ensite default-ssl
-
 - name: Habilitar ssl-params 
   command: a2enconf ssl-params
   notify:
    - Restart apache2
 
 
-
-
+#FALTA CONTROLAR POSIBLES ERRORES Y MENSAJE CUADNO INSTALACION OK
