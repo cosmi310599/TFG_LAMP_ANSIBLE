@@ -9,7 +9,7 @@
     - libapache2-mod-php
     - php-mcrypt
 
-## PHP-MYCRIPT ##
+## PHP-MYCRIPT ###
 ## This extension is a replacement for the crypt unix command, it is a meas to encrypt linux files
 
 ## The apache2 module is requeried --> used to enable or disable a specific apache2 web server module
