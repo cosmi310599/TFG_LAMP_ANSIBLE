@@ -7,8 +7,6 @@
                 ServerAdmin admin@{{ dominio }}
                 ServerName {{ dominio }}
 
-                
-
                 DocumentRoot /var/www/{{ dominio }}/public_html
 
                 ErrorLog ${APACHE_LOG_DIR}/error.log
@@ -21,6 +19,5 @@
 
 
 </VirtualHost>
-
-
-
+#Redirigir permanentemente
+#Configuramos este archivo para que se redireccione todo el trafico al https 

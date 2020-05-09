@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
+  <head> 
+  <meta charset='UTF-8'>
     <title>Formulario incidencias</title>
     <script>
       function comprobar_formulario(formulario){
@@ -10,7 +11,6 @@
                       return false;  }
         }
       </script>	
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
     <style>
       html, body {
       display: flex;
@@ -18,12 +18,13 @@
       font-family: Roboto, Arial, sans-serif;
       font-size: 15px;
       }
+
       form {
       border: 5px solid #8ebf42;
       width: 65%
-      
       }
-      input[type=text], input[type=option], input[type=radio] {
+
+      input[type=text], input[type=option] {
       width: 100%;
       padding: 16px 8px;
       margin: 8px 0;
@@ -31,6 +32,7 @@
       border: 1px solid #ccc;
       box-sizing: border-box;
       }
+
       button {
       background-color: #8ebf42;
       color: white;
@@ -39,10 +41,12 @@
       border: none;
       width: 30%;
       }
+
       h1 {
       text-align:center;
       font-size:18;
       }
+
       button:hover {
       opacity: 0.8;
       }
@@ -56,10 +60,10 @@
       }
 
       .textarea {
-        resize: both;
-        overflow: hidden;
-        width: 100%;
-        height: 100%;
+       resize: both;
+       overflow: hidden;
+       width: 100%;
+       height: 100%;
       }
      
     </style>
@@ -67,15 +71,14 @@
   </script>
   </head>
   <body>
-    <form action="/pagina.php" method="POST" onsubmit="return comprobar_formulario(this);">
+    <form action="/rec_datos.php" method="POST" onsubmit="return comprobar_formulario(this);">
       <h1>Formulario incidencias</h1>
       <div class="cont1">
       <hr/>
       <div class="cont2">
         <label for="nombre_completo"><strong>Nombre completo:</strong></label>
         <input type="text" placeholder="Introduzca nombre y apellidos" name="nombre_completo" required>
-        <label for="DNI"><strong>DNI:</strong></label>
-        <input type="text" placeholder="Introduzca DNI" name="dni" id="dni" required>
+        <input id="ip" type="hidden" name="ip" value="<?php echo $ip;?>">
         <label for="email"><strong>Correo electronico: </strong></label>
         <input type="text" placeholder="Introduzca email" name="email" required>
         <label class="text" for="departamento"><strong>Departamento: </strong></label>
@@ -95,7 +98,7 @@
         <br><br>
         <label class="text" for="descripcion_incidencia" ><strong>Descripción:</strong></label>
         <br><br>
-        <textarea class="textarea" placeholder="Describa la incidencia" name="incidencia" rows="10" cols="60" id="descripcion_incidencia" required></textarea>
+        <textarea class="textarea" maxlength="150" placeholder="Describa la incidencia" name="incidencia" rows="6" cols="60" id="descripcion_incidencia" required></textarea>
         <br><br>
 
       </div>

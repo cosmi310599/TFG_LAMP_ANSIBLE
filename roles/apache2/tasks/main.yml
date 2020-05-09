@@ -1,127 +1,148 @@
-- name: Instalación paquetes necesarios
-  package: name="{{ item[0] }}" state="{{ item[1] }}"
-  with_nested:
-    - [ 'ufw', 'apache2', 'php', 'libapache2-mod-php', 'php-mcrypt', 'curl' ]
-    - [ 'present']
+- name: Install required packages (for apache and php)
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ufw
+    - apache2
+    - php
+    - libapache2-mod-php
+    - php-mcrypt
 
-# poner mensaje debug en caso de error 
+## PHP-MYCRIPT ##
+## This extension is a replacement for the crypt unix command, it is a meas to encrypt linux files
 
-          
-# PHP-MYCRIPT --> Esta extension es un reemplazo para el comando crypt de unix, es un medio para encriptar 
-#archivos de linux
+## The apache2 module is requeried --> used to enable or disable a specific apache2 web server module
 
-#Es necesario el modulo de apache2 --> Habilita o deshabilita un módulo específico del servidor web Apache2
-#https://docs.ansible.com/ansible/latest/modules/apache2_module_module.html 
-#Usando este modulo, usamos un controlador de tareas para reiniciar apache2 
-
-- name: Habilitar firewall
+- name: Enable firewall
   ufw:
     state: enabled
 
-- name: Habilitar reglas firewall | SSH | HTTP | HTTPS
+- name: Enable firewall rules | SSH | HTTP | HTTPS
   ufw:
-    rule: '{{ item[0] }}'
-    port: '{{ item[1] }}'
-    proto: '{{ item[2] }}'
-  with_nested:
-    - [ 'allow' ]
-    - [ 22, 80, 443 ]
-    - [ 'tcp' ]
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - 22
+    - "{{ port_http }}"
+    - "{{ port_https }}"
 
+- name: Enable module
+  apache2_module:
+    name: rewrite
+    state: present
+  notify:
+   - Restart apache2
 
-- name: Habilitar modulo
-  apache2_module: name=rewrite state=present
-  notify: 
-    - Restart apache2 
-        
-#Necesitamos reiniciar apache2 despues de que el modulo este habilitado. 
-  
--  name: Habilitar modulo ssl 
-   apache2_module: 
-     name: ssl 
-     state: present
-   notify:
-     - Restart apache2
- 
-- name: Habilitar servicio apache 
+# It's necessary to restart apache2 after the module is enabled
+
+- name: Enable apache service
   service:
-    name: apache2
+    name: "{{ service_a }}"
     enabled: yes
 
-- name: Configuración ports.conf
+- name: Ports.conf | File configuration
   lineinfile:
-    dest: /etc/apache2/ports.conf
-    regexp: "^Listen "
-    line: "Listen 443"
+    path: /etc/apache2/ports.conf
+    regexp: "^Listen {{ port_https }}$"
+    line: "Listen {{ port_https }}"
+    insertafter: "^Listen {{ port_http }}$"
 
-- name: Configuracion hosts
+## Add another line to the configuration file to listen on the secure port 443
+
+- name: Hosts | File configuration
   lineinfile:
-    dest: /etc/hosts
-    line: "{{ ip_cliente }}	cesa.com"
+    path: /etc/hosts
+    line: "{{ inventory_hostname }}	cesa.com"
 
-# ver por que sustituye la linea en vez de añadirla
- 
-- name: Generar llave y cert 
-  shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/llave-apache.key -out /etc/ssl/certs/certificado-apache.crt -subj "/C=ES/ST=Madrid/O=Cesa.com/Email=admin@cesa.com" 
+## Revisar si aqui la añade cada vez que ejecute el playbook o no
+## Add the IP of the client machine and the domain url name
+## REVISAR
 
-#TENGO DUDA DE COMO ESCRIBIR LAS VARIABLES, SI CON COMILLAS O SIN 
+- name: Generate key pair
+  openssl_privatekey:
+    path: "/etc/ssl/private/{{ domain }}.key"
 
-- name: Crear estructura directorio raiz
-  file: 
-     path: /var/www/{{ dominio }}/public_html
-     state: directory
-     mode: '0755'
-           
-- name: Asignar permisos al usuario root
-  shell: chown -R $USER:$USER /var/www/{{ dominio }}/public_html
+- name: Generate CSR
+  openssl_csr:
+    path: "/etc/ssl/csr/{{ domain }}"
+    privatekey_path: "/etc/ssl/private/{{ domain }}.key"
+    country_name: ES
+    organization_name: Cesa
+    email_address: cesa@admin.com
+    common_name: "{{ domain }}"
 
-- name: Curl
-  raw: curl http://{{ dominio }}
-  
-   
-#Configuración del virtualhost + backup 
-- name: Crear archivo del virtualhost
+- name: Generate cert
+  openssl_certificate:
+    path: "/etc/ssl/certs/{{ domain }}.crt"
+    privatekey_path: "/etc/ssl/private/{{ domain }}.key"
+    csr_path: "/etc/ssl/csr/{{ domain }}.csr"
+    provider: selfsigned
+
+
+- name: Create root directory structure || Asign permissions to apache user
+  file:
+    path: "/var/www/{{ domain }}/public_html"
+    state: directory
+    mode: '0755'
+    owner: www-data
+    group: www-data
+
+## Virtualhost configuration and backup
+
+- name: Configure virtualhost file
   template:
-     src: 000-default.conf.j2 
-     dest: /etc/apache2/sites-available/{{ dominio }}.conf
+     src: "10-{{ domain }}.conf.j2"
+     dest: "/etc/apache2/sites-available/10-{{ domain }}.conf"
      backup: yes
 
+- name: Copy index.html
+  copy:
+   src: index.html
+   dest: "/var/www/{{ domain }}/public_html/"
+   mode: '0664'
 
-- name: Copiar fichero conf principal
+- name: Copy php for DB
+  copy:
+    src: rec_datos.php
+    dest: /var/www/{{ domain }}/public_html/
+  notify:
+   - Restart apache2
+
+- name: Copy main configuration file
   template:
      src: apache2.conf.j2
      dest: /etc/apache2/apache2.conf
-     backup: yes 
-        
-- name: Habilitar cambios 
-  command: a2ensite {{ dominio }}
-  notify:
-  - Restart apache2 
-#Revisar args 
-    
-#Vamos a crear un fragmento de configuración de apache con ajustes de cifrado seguro 
-#dentro de /etc/apache2/conf-available creamos un archivo que se llame ssl-params.conf
+     backup: yes
 
-- name: Crear ssl-params.conf
+- name: Enable changes
+  command: "a2ensite {{ domain }}"
+  notify:
+   - Restart apache2
+
+## The following file is needed to create an apache config snippet with secure encryption settings
+
+- name: Create ssl-params.conf
   copy:
    src: ssl-params.conf.j2
    dest: /etc/apache2/conf-available/ssl-params.conf
-     
-     
-- name: Habilitar cambios apache | SSL 
-  apache2_module: name=ssl state=present
+
+- name: Enable apache changes | SSL
+  apache2_module:
+    name: ssl
+    state: present
   notify:
    - Restart apache2
 
-- name: Habilitar cambios apache | Headers 
-  apache2_module: name=headers state=present
+- name: Enable apache changes | Headers
+  apache2_module:
+    name: headers
+    state: present
   notify:
    - Restart apache2
 
-- name: Habilitar ssl-params 
+- name: Enable ssl-params
   command: a2enconf ssl-params
   notify:
    - Restart apache2
-
-
-#FALTA CONTROLAR POSIBLES ERRORES Y MENSAJE CUADNO INSTALACION OK

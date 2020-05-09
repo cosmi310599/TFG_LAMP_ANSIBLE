@@ -1,12 +1,17 @@
-DROP DATABASE IF EXISTS tfg;
+DROP DATABASE IF EXISTS incidencias;
 
-CREATE DATABASE tfg;
+CREATE DATABASE incidencias;
 
-USE tfg;
+USE incidencias;
 
-CREATE TABLE IF NOT EXISTS saludo (
-  mensaje varchar(30) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-#Dejo por defecto MyISAM porque vamos a usar consultas select, si en algun momento se utiliza la base de datos
-#con otros fines cambio al motor de almacenamiento innodb
-INSERT INTO saludo (mensaje) VALUES('Hola mundo!');
+CREATE TABLE info(
+
+ Nombre     VARCHAR(30)     NOT NULL,
+ IP       VARCHAR(15)      NOT NULL,
+ Correo     VARCHAR(30)     NOT NULL,
+ Departamento       VARCHAR(10)     NOT NULL,
+ Asunto     VARCHAR(15)     NOT NULL,
+ Descripcion        VARCHAR(150)        NOT NULL,
+
+CONSTRAINT pk_IP PRIMARY KEY (IP)
+);

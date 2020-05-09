@@ -1,69 +1,61 @@
-- name: Instalación paquetes necesarios MariaDB
-  become: true
-  package: name="{{ item[0] }}" state="{{ item[1] }}"
-  with_nested:
-    - [ 'mariadb-server', 'python-mysqldb','default-libmysqlclient-dev','php-mysql']
-    - [ 'present']
-   
-   # debug:
-   #   msg: 'Instalación realizada con éxito'
+- name: Install required packages for MariaDB
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mariadb-server
+    - python-mysqldb
+    - default-libmysqlclient-dev
+    - php-mysql
 
-- name: Habilitar regla firewall para MySQL
+- name: Enable firewall rules for MySQL
   ufw:
-    rule: '{{ item[0] }}'
-    port: '{{ item[1] }}'
-  with_nested:
-    - [ 'allow' ]
-    - [ 3306 ]
+    rule: allow
+    port: 3306
 
-- name: Iniciar servicio MySQL y habilitarlo
+- name: Start MySQL service and enable it
   service:
     name: mysql
     state: started
-    enabled: yes 
+    enabled: yes
 
-- name: Crear base de datos
-  mysql_db: 
+- name: Create database
+  mysql_db:
     name: "{{ mysql_bdd }}"
     state: present
-      
-- name: Crear usuario con privilegios
+
+- name: Create user with privileges
   mysql_user:
-    name: "{{ mysql_usu }}"
-    password: "{{ mysql_password}}"
+    name: "{{ mysql_usuer }}"
+    password: "{{ mysql_password }}"
     priv: '*.*:ALL'
     host: localhost
     state: present
 
-- name: Copiar datos bdd
-  copy: src=bdd.sql dest=/tmp/bdd.sql
+- name: Copy database
+  copy:
+    src: bdd.sql
+    dest: /tmp/bdd.sql
 
-- name: Insertar los datos de ejemplo 
-  shell: cat /tmp/bdd.sql | mysql -u {{ mysql_usu }} -p{{ mysql_password }} {{ mysql_bdd }}
+- name: Insert database
+  mysql_db:
+     name: incidencias
+     state: import
+     target: /tmp/bdd.sql
   notify:
    - Restart mariadb
 
-- name: Instalar script de php con conexión a base de datos.
-  copy:
-   src: index.php
-   dest: /var/www/{{ dominio }}/public_html/
-   mode: '0664'
-  notify:
-   - Restart apache2
-
-- name: Copiar el sh de backup 
+- name: Copy shell script for backup
   copy:
     src: backup.sh
-    dest: /home/cliente/
-    
-- name: Backup de las bases de datos 
-  cron: 
+    dest: /etc/backup/
+
+- name: Generate a cron task to run the sh
+  cron:
     name: "Backup"
     minute: "0"
     hour: "12"
-    day: "1"
+    day: "15"
     job: "sh /home/cliente/backup.sh"
-      
 
-#FALTA CONFIGURAR Y COPIAR my.cnf 
-
+# Copiar el my.cnf

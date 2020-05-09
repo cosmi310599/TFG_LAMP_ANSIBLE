@@ -1,6 +1,8 @@
 ---
 - name: Restart apache2
-  service: name="{{ servicio_apache }}" state="{{ status_apache }}"
-- name: Reload apache2
-  service: name="{{ servicio_apache }}" state="{{ reload_apache }}"
+  service:
+    name: "{{ service_a }}"
+    state: restart
+
+#He quitado el reload
 ...

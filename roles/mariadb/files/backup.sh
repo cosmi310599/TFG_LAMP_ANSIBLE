@@ -1,23 +1,21 @@
 #!/bin/bash
-#Variables
+## Variables
 DATE=$(date +%d-%m-%Y)
 BACKUP_DIR="/backup/test-backup"
 MYSQL_USER="admin_1"
 MYSQL_PASSWORD="Admin12345"
 
-#Crear el directorio en base a la fecha
+## Create a directory where the backup will be saved
+
 mkdir -p /etc/mysql/$BACKUP_DIR/$DATE
 
-# Generar lista de las bases de datos y recortar las que no necesite 
+## Generate a list with the name of the databases and cut the ones that you do not want to back up
 databases=`mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -e "SHOW DATABASES;" | grep -Ev "(information_schema|perfomance_schema)"`
 
-#Hacer copia de seguridad por separado de cada base de datos
+## Backup for each database
 for db in $databases; do
-#echo $db
 mysqldump --force --opt --skip-lock-tables -u $MYSQL_USER -p$MYSQL_PASSWORD --databases $db > "/etc/mysql/$BACKUP_DIR/$DATE/$db.sql"
 done
 
-# Borrar los archivos anteriores a 15 días
+# Delete files older than 15 days
 find /etc/mysql/$BACKUP_DIR/* -mtime +15 -exec rm {} \;
-
-

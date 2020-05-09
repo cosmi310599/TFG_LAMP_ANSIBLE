@@ -1,19 +1,10 @@
-- name: Instalar php + extensiones 
-  become: true
-  apt: pkg={{ item }} state=installed update_cache=true
-  with_items:
-  - php 
-  - php-mysql
-  - libapache2-mod-php
-
 - name: Configurar php con apache2
-  become: true
-  copy: src=www.conf dest=/etc/php/7.0/fpm/pool.d/
+  copy:
+    src: www.conf.j2
+    dest: /etc/php/7.0/fpm/pool.d/www.conf
   notify:
-    - Restart 
+    - Restart
 
-#FALTA CONFIGURAR WWW.CONF Y CONTROLAR POSIBLES ERRORES
-
-
-
+#All installations of the php packages are in the roles of apache and mariadb
+#FALTA CONFIGURAR WWW.CONF
 

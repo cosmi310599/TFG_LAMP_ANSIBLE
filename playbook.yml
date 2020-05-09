@@ -1,6 +1,5 @@
 - hosts: clientes
-  become_user: root
-  roles: 
+  roles:
     - apache2
     - mariadb
-    - php 
+    - php

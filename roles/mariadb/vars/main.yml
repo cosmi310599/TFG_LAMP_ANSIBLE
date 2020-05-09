@@ -1,9 +1,9 @@
 ---
 mysql_bdd: saludo
-mysql_usu: admin_1
+mysql_user: admin_1
 mysql_password: "Admin12345"
-dominio: cesa.com
-... 
+domain: cesa.com
+...
 
 
 #Este fichero al tener una variable que contiene la contraseña lo voy a cifrar con el comando
