@@ -18,7 +18,7 @@
   ufw:
     state: enabled
 
-- name: Enable firewall rules | SSH | HTTP | HTTPS
+- name: Enable firewall rules - SSH - HTTP - HTTPS
   ufw:
     rule: allow
     port: "{{ item }}"
@@ -42,7 +42,7 @@
     name: "{{ service_a }}"
     enabled: yes
 
-- name: Ports.conf | File configuration
+- name: Ports.conf and file configuration
   lineinfile:
     path: /etc/apache2/ports.conf
     regexp: "^Listen {{ port_https }}$"
@@ -51,7 +51,7 @@
 
 ## Add another line to the configuration file to listen on the secure port 443
 
-- name: Hosts | File configuration
+- name: Hosts and file configuration
   lineinfile:
     path: /etc/hosts
     line: "{{ inventory_hostname }}	cesa.com"
@@ -61,12 +61,12 @@
 ## REVISAR
 
 - name: Generate key pair
-  openssl_privatekey:
+  openssh_keypair:
     path: "/etc/ssl/private/{{ domain }}.key"
 
-- name: Generate CSR
+ - name: Generate CSR
   openssl_csr:
-    path: "/etc/ssl/csr/{{ domain }}"
+    path: "/etc/ssl/csr/{{ domain }}.csr"
     privatekey_path: "/etc/ssl/private/{{ domain }}.key"
     country_name: ES
     organization_name: Cesa
@@ -81,7 +81,7 @@
     provider: selfsigned
 
 
-- name: Create root directory structure || Asign permissions to apache user
+- name: Create root directory structure and asign permissions to apache user
   file:
     path: "/var/www/{{ domain }}/public_html"
     state: directory
@@ -128,14 +128,14 @@
    src: ssl-params.conf.j2
    dest: /etc/apache2/conf-available/ssl-params.conf
 
-- name: Enable apache changes | SSL
+- name: Enable apache changes - SSL
   apache2_module:
     name: ssl
     state: present
   notify:
    - Restart apache2
 
-- name: Enable apache changes | Headers
+- name: Enable apache changes - Headers
   apache2_module:
     name: headers
     state: present
