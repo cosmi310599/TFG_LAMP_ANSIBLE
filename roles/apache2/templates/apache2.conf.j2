@@ -1,11 +1,11 @@
 ####
 #https://web.mit.edu/rhel-doc/4/RH-DOCS/rhel-rg-es-4/s1-apache-config.html
 ####
-# This is the main Apache server configuration file.  It contains 
-# the configuration directives that give the server its 
-# instructions. See http://httpd.apache.org/docs/2.4/ for detailed 
-# information about the directives and 
-# /usr/share/doc/apache2/README.Debian about Debian specific 
+# This is the main Apache server configuration file.  It contains
+# the configuration directives that give the server its
+# instructions. See http://httpd.apache.org/docs/2.4/ for detailed
+# information about the directives and
+# /usr/share/doc/apache2/README.Debian about Debian specific
 # hints.
 #
 #
@@ -171,7 +171,7 @@ Include ports.conf
 	Require all granted
 </Directory>
 
-<Directory /var/www/{{ dominio }}/public_html>
+<Directory /var/www/{{ domain }}/public_html>
 	Options Indexes FollowSymLinks
 	AllowOverride None
 	Require all granted

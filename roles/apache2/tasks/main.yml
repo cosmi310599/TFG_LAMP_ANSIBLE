@@ -49,6 +49,7 @@
     line: "Listen {{ port_https }}"
     insertafter: "^Listen {{ port_http }}$"
 
+
 ## Add another line to the configuration file to listen on the secure port 443
 
 - name: Hosts and file configuration
