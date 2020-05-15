@@ -1,0 +1,27 @@
+<Virtualhost *:{{ port_http}}>
+    ServerAdmin admin@{{ domain }}
+    ServerName {{ domain }}
+    Redirect / https://{{ domain }}
+</Virtualhost>
+<VirtualHost _default_:{{ port_https }}>
+    ServerAdmin admin@{{ domain }}
+    ServerName {{ domain }}
+
+    DocumentRoot /var/www/{{ domain }}/public_html
+
+    <Directory /var/www/{{ domain }}/public_html>
+	    Options Indexes FollowSymLinks
+	    AllowOverride None
+	    Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    SSLEngine on
+    SSLCertificateFile      /etc/ssl/certs/{{ domain }}.crt
+    SSLCertificateKeyFile /etc/ssl/private/{{ domain }}.key
+
+</VirtualHost>
+
+#Configure to redirect all traffic to https

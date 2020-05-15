@@ -1,6 +1,6 @@
 ---
-port_http: 80
-port_https: 443
-domain: cesa.com
-servicive_a: apache2
-#meter en vars ?
+port_http: '80'
+port_https: '443'
+domain: www.cesa.com
+
+

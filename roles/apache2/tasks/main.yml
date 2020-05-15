@@ -3,28 +3,23 @@
     name: "{{ item }}"
     state: present
   with_items:
-    - ufw
     - apache2
     - php
     - libapache2-mod-php
-    - php-mcrypt
+    - python-cryptography
 
 ## PHP-MYCRIPT ###
 ## This extension is a replacement for the crypt unix command, it is a meas to encrypt linux files
 
 ## The apache2 module is requeried --> used to enable or disable a specific apache2 web server module
 
-- name: Enable firewall
-  ufw:
-    state: enabled
-
-- name: Enable firewall rules - SSH - HTTP - HTTPS
+- name: Enable firewall rules | SSH | HTTP | HTTPS
   ufw:
     rule: allow
     port: "{{ item }}"
     proto: tcp
   with_items:
-    - 22
+    - '22'
     - "{{ port_http }}"
     - "{{ port_https }}"
 
@@ -39,33 +34,29 @@
 
 - name: Enable apache service
   service:
-    name: "{{ service_a }}"
+    name: "{{ service }}"
     enabled: yes
-
-- name: Ports.conf and file configuration
-  lineinfile:
-    path: /etc/apache2/ports.conf
-    regexp: "^Listen {{ port_https }}$"
-    line: "Listen {{ port_https }}"
-    insertafter: "^Listen {{ port_http }}$"
-
 
 ## Add another line to the configuration file to listen on the secure port 443
 
-- name: Hosts and file configuration
+- name: Hosts | File configuration
   lineinfile:
     path: /etc/hosts
-    line: "{{ inventory_hostname }}	cesa.com"
+    line: "{{ inventory_hostname }}	{{ domain }}"
 
-## Revisar si aqui la añade cada vez que ejecute el playbook o no
 ## Add the IP of the client machine and the domain url name
-## REVISAR
 
 - name: Generate key pair
-  openssh_keypair:
+  openssl_privatekey:
     path: "/etc/ssl/private/{{ domain }}.key"
 
- - name: Generate CSR
+- name: Create directory for CSR files
+  file:
+    path: /etc/ssl/csr
+    state: directory
+    mode: '0755'
+
+- name: Generate CSR
   openssl_csr:
     path: "/etc/ssl/csr/{{ domain }}.csr"
     privatekey_path: "/etc/ssl/private/{{ domain }}.key"
@@ -81,8 +72,7 @@
     csr_path: "/etc/ssl/csr/{{ domain }}.csr"
     provider: selfsigned
 
-
-- name: Create root directory structure and asign permissions to apache user
+- name: Create root directory structure | Asign permissions to apache user
   file:
     path: "/var/www/{{ domain }}/public_html"
     state: directory
@@ -90,13 +80,39 @@
     owner: www-data
     group: www-data
 
+- name: Create ssl-params.conf
+  copy:
+   src: ssl-params.conf.j2
+   dest: /etc/apache2/conf-available/ssl-params.conf
+
+- name: Enable apache changes | SSL
+  apache2_module:
+    name: ssl
+    state: present
+  notify:
+   - Restart apache2
+
+- name: Enable apache changes | Headers
+  apache2_module:
+    name: headers
+    state: present
+  notify:
+   - Restart apache2
+
+- name: Enable ssl-params
+  command: a2enconf ssl-params
+  notify:
+   - Restart apache2
+
 ## Virtualhost configuration and backup
 
 - name: Configure virtualhost file
   template:
-     src: "10-{{ domain }}.conf.j2"
+     src: "virtualhost.conf.j2"
      dest: "/etc/apache2/sites-available/10-{{ domain }}.conf"
      backup: yes
+
+## This directory contains the configurations of all available modules.
 
 - name: Copy index.html
   copy:
@@ -106,44 +122,12 @@
 
 - name: Copy php for DB
   copy:
-    src: rec_datos.php
-    dest: /var/www/{{ domain }}/public_html/
+   src: rec_datos.php
+   dest: /var/www/{{ domain }}/public_html/
   notify:
    - Restart apache2
-
-- name: Copy main configuration file
-  template:
-     src: apache2.conf.j2
-     dest: /etc/apache2/apache2.conf
-     backup: yes
 
 - name: Enable changes
-  command: "a2ensite {{ domain }}"
-  notify:
-   - Restart apache2
-
-## The following file is needed to create an apache config snippet with secure encryption settings
-
-- name: Create ssl-params.conf
-  copy:
-   src: ssl-params.conf.j2
-   dest: /etc/apache2/conf-available/ssl-params.conf
-
-- name: Enable apache changes - SSL
-  apache2_module:
-    name: ssl
-    state: present
-  notify:
-   - Restart apache2
-
-- name: Enable apache changes - Headers
-  apache2_module:
-    name: headers
-    state: present
-  notify:
-   - Restart apache2
-
-- name: Enable ssl-params
-  command: a2enconf ssl-params
+  command: "a2ensite 10-{{ domain }}"
   notify:
    - Restart apache2

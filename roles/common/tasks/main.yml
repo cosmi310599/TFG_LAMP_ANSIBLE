@@ -1,0 +1,24 @@
+- name: Update repositories
+  apt:
+    update_cache: yes
+    #Is the equivalent of the command apt-get update
+    force_apt_get: yes
+    #This parameter is specified for not use aptitude command
+    cache_valid_time: 3600
+
+- name: Upgrading all the apt packages
+  apt:
+    upgrade: dist
+    force_apt_get: yes
+
+- name: Install common packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ufw
+
+- name: Enable firewall
+  ufw:
+    state: enabled
+

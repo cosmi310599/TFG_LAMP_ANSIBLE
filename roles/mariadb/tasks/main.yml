@@ -1,9 +1,17 @@
+## The mariadb package is installed with the apt module because it is installed with the package module
+## it misplaces the main mysql configuration file in debian and generates errors
+## and that's why I separate it and install it with another module different from the rest of the necessary packages
+
+- name: Install package MariaDB with APT
+  apt:
+    name: mariadb-server
+    state: present
+
 - name: Install required packages for MariaDB
   package:
     name: "{{ item }}"
     state: present
   with_items:
-    - mariadb-server
     - python-mysqldb
     - default-libmysqlclient-dev
     - php-mysql
@@ -11,7 +19,7 @@
 - name: Enable firewall rules for MySQL
   ufw:
     rule: allow
-    port: 3306
+    port: '3306'
 
 - name: Start MySQL service and enable it
   service:
@@ -19,18 +27,26 @@
     state: started
     enabled: yes
 
-- name: Create database
-  mysql_db:
-    name: "{{ mysql_bdd }}"
-    state: present
-
 - name: Create user with privileges
   mysql_user:
-    name: "{{ mysql_usuer }}"
+    name: "{{ mysql_user }}"
     password: "{{ mysql_password }}"
     priv: '*.*:ALL'
     host: localhost
     state: present
+  no_log: True
+
+## If we save the output in a register, all the secret data such as passwords and usernames are exposed
+## To keep confidential values out of registries, use the option no_log: True
+
+- name: Create database
+  mysql_db:
+    name: "{{ mysql_bdd }}"
+    state: present
+  register: db_created
+
+## We register the output of the command in a variable that will be used
+## later to condition the action of another task
 
 - name: Copy database
   copy:
@@ -39,11 +55,10 @@
 
 - name: Insert database
   mysql_db:
-     name: incidencias
-     state: import
-     target: /tmp/bdd.sql
-  notify:
-   - Restart mariadb
+    name: incidencias
+    state: import
+    target: /tmp/bdd.sql
+  when: db_created.changed
 
 - name: Copy shell script for backup
   copy:
@@ -58,4 +73,4 @@
     day: "15"
     job: "sh /home/cliente/backup.sh"
 
-# Copiar el my.cnf
+

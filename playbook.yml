@@ -1,5 +1,7 @@
 - hosts: clientes
+  become: yes
   roles:
-    - apache2
+    - common
     - mariadb
-    - php
+    - apache2
+

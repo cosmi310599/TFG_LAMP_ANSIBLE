@@ -5,7 +5,7 @@ BACKUP_DIR="/backup/test-backup"
 MYSQL_USER="admin_1"
 MYSQL_PASSWORD="Admin12345"
 
-## Create a directory where the backup will be saved
+# VER COMO ENCRIPTAR SOLO ESTE VALOR O TODO EL FICHERO
 
 mkdir -p /etc/mysql/$BACKUP_DIR/$DATE
 
