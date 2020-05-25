@@ -6,20 +6,20 @@
     - apache2
     - php
     - libapache2-mod-php
-    - python-cryptography
+   # - python-cryptography
 
 ## PHP-MYCRIPT ###
 ## This extension is a replacement for the crypt unix command, it is a meas to encrypt linux files
 
 ## The apache2 module is requeried --> used to enable or disable a specific apache2 web server module
 
-- name: Enable firewall rules | SSH | HTTP | HTTPS
+- name: Enable firewall rules | HTTP | HTTPS
   ufw:
     rule: allow
     port: "{{ item }}"
     proto: tcp
   with_items:
-    - '22'
+   # - "22"
     - "{{ port_http }}"
     - "{{ port_https }}"
 
@@ -114,18 +114,17 @@
 
 ## This directory contains the configurations of all available modules.
 
-- name: Copy index.html
+- name: Copy files for the website
   copy:
-   src: index.html
+   src: "{{ item }}"
    dest: "/var/www/{{ domain }}/public_html/"
    mode: '0664'
-
-- name: Copy php for DB
-  copy:
-   src: rec_datos.php
-   dest: /var/www/{{ domain }}/public_html/
-  notify:
-   - Restart apache2
+  with_items:
+   - index.html
+   - inicio.php
+   - registro.php
+   - formulario.php
+   - CSS
 
 - name: Enable changes
   command: "a2ensite 10-{{ domain }}"

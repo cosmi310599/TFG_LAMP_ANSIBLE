@@ -9,16 +9,18 @@
 - name: Upgrading all the apt packages
   apt:
     upgrade: dist
-    force_apt_get: yes
+    force_apt_get: true
 
 - name: Install common packages
-  package:
-    name: "{{ item }}"
+  apt:
+    name: ufw
     state: present
-  with_items:
-    - ufw
 
 - name: Enable firewall
   ufw:
     state: enabled
 
+#- name: Install python-apt dependency
+#  apt:
+#    name: python-apt
+#    state: latest

@@ -5,8 +5,6 @@ BACKUP_DIR="/backup/test-backup"
 MYSQL_USER="admin_1"
 MYSQL_PASSWORD="Admin12345"
 
-# VER COMO ENCRIPTAR SOLO ESTE VALOR O TODO EL FICHERO
-
 mkdir -p /etc/mysql/$BACKUP_DIR/$DATE
 
 ## Generate a list with the name of the databases and cut the ones that you do not want to back up

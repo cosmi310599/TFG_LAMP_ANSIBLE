@@ -3,15 +3,6 @@
   <head>
   <meta charset='UTF-8'>
     <title>Formulario incidencias</title>
-    <script>
-      function comprobar_formulario(formulario){
-      var fdni = /^[0-9]{8}[A-Z]$/;
-            if (!(fdni.test(formulario.dni.value))) {
-                      alert('ERROR , Contenido del dni NO es un DNI válido.');
-                      return false;  }
-        }
-    </script>
-
     <style>
       html, body {
       display: flex;
@@ -22,49 +13,25 @@
 
       form {
       border: 5px solid #8ebf42;
-      width: 65%
+      width: 95%
       }
 
-      input[type=text], input[type=option] {
-      width: 100%;
-      padding: 16px 8px;
-      margin: 8px 0;
-      display: inline-block;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      }
-
-      button {
+      button, input[type=button]{
       background-color: #8ebf42;
       color: white;
       padding: 14px 0;
       margin: 10px 0;
       border: none;
-      width: 30%;
+      width: 100%;
       }
 
       h1 {
       text-align:center;
       font-size:18;
       }
-
-      button:hover {
-      opacity: 0.8;
-      }
       .cont1 {
       text-align: left;
       margin: 24px 50px 12px;
-      }
-      .cont2 {
-      padding: 16px 0;
-      text-align:left;
-      }
-
-      .textarea {
-       resize: both;
-       overflow: hidden;
-       width: 100%;
-       height: 100%;
       }
 
     </style>
@@ -72,38 +39,14 @@
   </script>
   </head>
   <body>
-    <form action="/rec_datos.php" method="POST" onsubmit="return comprobar_formulario(this);">
+    <form>
       <h1>Formulario incidencias</h1>
       <div class="cont1">
       <hr/>
       <div class="cont2">
-        <label for="nombre_completo"><strong>Nombre completo:</strong></label>
-        <input type="text" placeholder="Introduzca nombre y apellidos" name="nombre_completo" required>
-        <input id="ip" type="hidden" name="ip" value="<?php echo $ip;?>">
-        <label for="email"><strong>Correo electronico: </strong></label>
-        <input type="text" placeholder="Introduzca email" name="email" required>
-        <label class="text" for="departamento"><strong>Departamento: </strong></label>
-        <select name="departamento" id="departamento" required>
-            <option value="Marketing">Marketing</option>
-            <option value="Ventas">Ventas</option>
-            <option value="RRHH">RRHH</option>
-        </select>
-        <br><br>
-        <label class="text" for="asunto"><strong>Asunto del mensaje:</strong></label>
-        <select name="asunto" id="asunto" required>
-            <option value="Incidencia">Incidencia</option>
-            <option value="Consulta">Consulta</option>
-            <option value="Alta">Sugerencia</option>
-            <option value="Otro">Otro</option>
-        </select>
-        <br><br>
-        <label class="text" for="descripcion_incidencia" ><strong>Descripción:</strong></label>
-        <br><br>
-        <textarea class="textarea" maxlength="150" placeholder="Describa la incidencia" name="incidencia" rows="6" cols="60" id="descripcion_incidencia" required></textarea>
-        <br><br>
+			<input type="button" value="Iniciar sesión" onClick="document.location.href='inicio.php'" />
+      <input type="button" value="Registrarme" onClick="document.location.href='registro.php'" />
       </div>
-      <button type="submit">Enviar</button>
-      <button type="reset">Borrar</button>
     </form>
   </body>
 </html>

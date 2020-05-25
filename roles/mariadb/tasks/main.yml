@@ -63,7 +63,7 @@
 - name: Copy shell script for backup
   copy:
     src: backup.sh
-    dest: /etc/backup/
+    dest: /etc/mysql/
 
 - name: Generate a cron task to run the sh
   cron:
@@ -71,6 +71,6 @@
     minute: "0"
     hour: "12"
     day: "15"
-    job: "sh /home/cliente/backup.sh"
+    job: "sh /etc/mysql/backup.sh"
 
 
