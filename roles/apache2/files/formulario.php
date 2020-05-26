@@ -13,7 +13,7 @@ $incidencia =$_POST["incidencia"];
 $consulta = "INSERT INTO datos (Correo,Departamento,Asunto,Descripcion) VALUES ('$correo','$departamento','$asunto','$incidencia')";
     if (mysqli_query($mi_conexion,$consulta)){
 
-      echo  "<script> alert('Gracias, pronto atenderemos su solicitud'); window.location.href='./formulario.php'; </script>";
+      echo  "<script> alert('Gracias, pronto atenderemos su solicitud'); window.location.href='./inicio.php'; </script>";
 
     }else{
 
