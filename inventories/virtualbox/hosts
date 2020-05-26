@@ -1,2 +1,2 @@
 [lamp]
-192.168.0.26 ansible_user=root ansible_python_interpreter= /usr/bin/python3.5
+192.168.0.26 ansible_user=root

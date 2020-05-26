@@ -14,13 +14,12 @@ if (mysqli_num_rows($resultado)==0) {
   $insertar = "INSERT INTO info (Correo, Num_equipo) VALUES ('$correo', '$id')";
    if (mysqli_query($mi_conexion,$insertar)){
     echo  "<script> alert('Se ha registrado correctamente'); window.location.href='./inicio.php'; </script>";
-           //header('Location: ./inicio.php');
+
   }else{
          echo "Error" . mysqli_errno($mi_conexion);
   }
 } else {
   echo  "<script> alert('El correo ya esta en uso, por favor pruebe con otro o vuelva al inicio para iniciar sesion'); window.location.href='./registro.php'; </script>";
-    //header('Location: ./registro.php');
 }
 }
 mysqli_close($mi_conexion);

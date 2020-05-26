@@ -13,10 +13,11 @@ if (!empty($_POST)){
   }
   else{
       echo  "<script> alert('No esta registrado, por favor rellene el siguiente formulario'); window.location.href='./registro.php'; </script>";
-       // header('Location: ./registro.php');
+
     }
   }
 else{
+
   //Necesario proque sino redirige en bucle
 }
 ?>
