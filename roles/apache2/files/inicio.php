@@ -36,7 +36,7 @@ function validarEmail( email ) {
 </script>
   </head>
   <body>
-    <form  method="POST">
+    <form  method="POST" onsubmit="return validarEmail(this);>
       <h1>Inicio sesión</h1>
       <div class="cont1">
       <hr/>
