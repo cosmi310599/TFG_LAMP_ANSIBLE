@@ -13,12 +13,14 @@ $resultado = mysqli_query($mi_conexion, $comprobar);
 if (mysqli_num_rows($resultado)==0) {
   $insertar = "INSERT INTO info (Correo, Num_equipo) VALUES ('$correo', '$id')";
    if (mysqli_query($mi_conexion,$insertar)){
-           header('Location: ./inicio.php');
+    echo  "<script> alert('Se ha registrado correctamente'); window.location.href='./inicio.php'; </script>";
+           //header('Location: ./inicio.php');
   }else{
          echo "Error" . mysqli_errno($mi_conexion);
   }
 } else {
-    header('Location: ./registro.php');
+  echo  "<script> alert('El correo ya esta en uso, por favor pruebe con otro o vuelva al inicio para iniciar sesion'); window.location.href='./registro.php'; </script>";
+    //header('Location: ./registro.php');
 }
 }
 mysqli_close($mi_conexion);
@@ -27,11 +29,19 @@ mysqli_close($mi_conexion);
   <head>
   <meta charset='UTF-8'>
     <title>Formulario datos</title>
-    <link rel="stylesheet" href="CSS/estilo.css">
+    <link rel="stylesheet" href="CSS/estilo_registro.css"/>
+    <script>
+function validarEmail( email ) {
+    correo= /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if ( !correo.test(email) )
+        alert("Error: La dirección de correo es incorrecta.");
+       window.location.href="./registro.php";
+}
+</script>
   </head>
   <body>
     <form method="POST">
-      <h1>Formulario registro</h1>
+      <h1>Formulario registo</h1>
       <div class="cont1">
       <hr/>
       <div class="cont2">

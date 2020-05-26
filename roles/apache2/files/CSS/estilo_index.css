@@ -1,0 +1,36 @@
+
+html, body {
+display: flex;
+justify-content: center;
+font-family: Roboto, Arial, sans-serif;
+font-size: 15px;
+}
+
+form {
+border: 5px solid #8ebf42;
+width: 95%;
+}
+
+button, input[type=button]{
+background-color: #8ebf42;
+color: white;
+padding: 14px 0;
+margin: 10px 0;
+border: none;
+width: 100%;
+}
+
+h1 {
+text-align: center;
+font-size: 18;
+}
+
+.cont1 {
+text-align: left;
+margin: 24px 50px 12px;
+}
+
+input[type=button]:hover {
+opacity: 0.8;
+}
+

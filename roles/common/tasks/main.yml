@@ -11,6 +11,11 @@
     upgrade: dist
     force_apt_get: true
 
+- name: Install python-apt dependency
+  apt:
+    name: python-apt
+    state: latest
+
 - name: Install common packages
   apt:
     name: ufw
@@ -20,7 +25,3 @@
   ufw:
     state: enabled
 
-#- name: Install python-apt dependency
-#  apt:
-#    name: python-apt
-#    state: latest

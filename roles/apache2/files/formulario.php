@@ -1,5 +1,5 @@
 <?php
-// Conectar a la bdd
+// Conexión a la base de datos
 $mi_conexion = mysqli_connect('localhost','admin_1','Admin12345','incidencias',3306);
   if (mysqli_connect_errno($mi_conexion)) {
     die("Error en la conexion de base de datos: ".mysqli_connect_error());
@@ -10,26 +10,27 @@ $departamento = $_POST["departamento"];
 $asunto = $_POST["asunto"];
 $incidencia =$_POST["incidencia"];
 
-$consulta = "INSERT INTO datos
-(Correo,Departamento,Asunto,Descripcion) VALUES ('$correo','$departamento','$asunto','$incidencia')";
+$consulta = "INSERT INTO datos (Correo,Departamento,Asunto,Descripcion) VALUES ('$correo','$departamento','$asunto','$incidencia')";
     if (mysqli_query($mi_conexion,$consulta)){
-	    echo "<hr>";
-	    echo "<h1 align='center'>Gracias, pronto atenderemos su solicitud </h1>";
-	    echo "</hr>";
+
+      echo  "<script> alert('Gracias, pronto atenderemos su solicitud'); window.location.href='./formulario.php'; </script>";
 
     }else{
+
         echo "Error" . mysqli_errno($mi_conexion);
   }
 }
 else {
-  //Redirige
+
+//Es necesario este else porque sino redirige en bucle
+
 }
 ?>
 <html>
   <head>
   <meta charset='UTF-8'>
     <title>Formulario datos</title>
-    <link rel="stylesheet" type="text/css" href="CSS/estilo.css">
+    <link rel="stylesheet" type="text/css" href="CSS/estilo_formulario.css">
   </head>
   <body>
     <form method="POST">

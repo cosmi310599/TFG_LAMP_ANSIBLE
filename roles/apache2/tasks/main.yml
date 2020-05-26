@@ -6,7 +6,6 @@
     - apache2
     - php
     - libapache2-mod-php
-   # - python-cryptography
 
 ## PHP-MYCRIPT ###
 ## This extension is a replacement for the crypt unix command, it is a meas to encrypt linux files
@@ -19,7 +18,6 @@
     port: "{{ item }}"
     proto: tcp
   with_items:
-   # - "22"
     - "{{ port_http }}"
     - "{{ port_https }}"
 

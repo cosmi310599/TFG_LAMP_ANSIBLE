@@ -4,4 +4,3 @@
     name: "{{ service }}"
     state: restarted
 
-...

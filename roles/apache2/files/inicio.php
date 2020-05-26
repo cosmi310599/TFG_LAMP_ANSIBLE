@@ -4,7 +4,7 @@ $mi_conexion = mysqli_connect('localhost','admin_1','Admin12345','incidencias',3
     die("Error en la conexion de base de datos: ".mysqli_connect_error());
 }
 if (!empty($_POST)){
-$correo = $_POST["email"];
+  $correo = $_POST["email"];
   $comprobar="SELECT Correo FROM info WHERE Correo='".$correo."'";
   $resultado = mysqli_query($mi_conexion, $comprobar);
 
@@ -12,29 +12,39 @@ $correo = $_POST["email"];
       header('Location: ./formulario.php?email='.$correo);
   }
   else{
-        header('Location: ./registro.php');
+      echo  "<script> alert('No esta registrado, por favor rellene el siguiente formulario'); window.location.href='./registro.php'; </script>";
+       // header('Location: ./registro.php');
     }
   }
 else{
-  //Redirigir
+  //Necesario proque sino redirige en bucle
 }
 ?>
 <html>
   <head>
   <meta charset='UTF-8'>
     <title>Inicio sesión</title>
-    <link rel="stylesheet" type="text/css" href="CSS/estilo.css">
+    <link rel="stylesheet" type="text/css" href="CSS/estilo_inicio.css"/>
+    <script>
+function validarEmail( email ) {
+    correo= /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if ( !correo.test(email) )
+        alert("Error: La dirección de correo es incorrecta.");
+       window.location.href="./inicio.php";
+}
+
+</script>
   </head>
   <body>
-    <form class="form2" method="POST">
-      <h1>Formulario registro</h1>
+    <form  method="POST">
+      <h1>Inicio sesión</h1>
       <div class="cont1">
       <hr/>
       <div class="cont2">
        <label for="email"><strong>Correo electronico: </strong></label>
        <input type="text" placeholder="Introduzca email" name="email" required>
-    <button type="submit">Acceder</button>
-    <button type="reset">Borrar</button>
+       <button type="submit">Acceder</button>
+      <button type="reset">Borrar</button>
     </form>
   </body>
 </html>

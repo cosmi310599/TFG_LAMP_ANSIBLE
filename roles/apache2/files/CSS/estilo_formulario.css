@@ -4,10 +4,12 @@ justify-content: center;
 font-family: sans-serif;
 font-size: 15px;
 }
+
 form {
 border: 5px solid #8ebf42;
 width: 80%
 }
+
 input[type=text]{
 width: 100%;
 padding: 16px 8px;
@@ -16,14 +18,18 @@ display: inline-block;
 border: 1px solid #ccc;
 box-sizing: border-box;
 }
+
 button, input[type="button"] {
 background-color: #8ebf42;
 color: white;
-padding: 14px 0;
-margin: 10px 0;
+padding: 14px;
+margin: 3px;
+margin-right: 20px;
+margin-left: 30px;
 border: none;
 width: 30%;
 }
+
 h1 {
 text-align:center;
 font-size:18;
@@ -32,14 +38,17 @@ font-size:18;
 button:hover {
 opacity: 0.8;
 }
+
 .cont1 {
 text-align: left;
 margin: 24px 50px 12px;
 }
+
 .cont2 {
 padding: 16px 0;
 text-align:left;
 }
+
 textarea {
  resize: none;
  overflow: hidden;
@@ -47,7 +56,4 @@ textarea {
  height: 50%;
 }
 
-.form2 {
-border: 5px solid #8ebf42;
-width: 40%
-}
+
