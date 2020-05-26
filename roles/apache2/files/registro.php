@@ -31,7 +31,7 @@ mysqli_close($mi_conexion);
     <title>Formulario datos</title>
     <link rel="stylesheet" href="CSS/estilo_registro.css"/>
     <script>
-function validarEmail( email ) {
+function comprobar_email(email) {
     correo= /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     if ( !correo.test(email) )
         alert("Error: La dirección de correo es incorrecta.");
@@ -40,7 +40,7 @@ function validarEmail( email ) {
 </script>
   </head>
   <body>
-    <form method="POST" onsubmit="return validarEmail(this);>
+    <form method="POST" onsubmit="return comprobar_email(this);">
       <h1>Formulario registo</h1>
       <div class="cont1">
       <hr/>

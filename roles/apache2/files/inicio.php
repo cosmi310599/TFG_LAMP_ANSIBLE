@@ -26,7 +26,7 @@ else{
     <title>Inicio sesión</title>
     <link rel="stylesheet" type="text/css" href="CSS/estilo_inicio.css"/>
     <script>
-function validarEmail( email ) {
+function comprobar_email(email) {
     correo= /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     if ( !correo.test(email) )
         alert("Error: La dirección de correo es incorrecta.");
@@ -36,7 +36,7 @@ function validarEmail( email ) {
 </script>
   </head>
   <body>
-    <form  method="POST" onsubmit="return validarEmail(this);>
+    <form  method="POST" onsubmit="return comprobar_email(this)";>
       <h1>Inicio sesión</h1>
       <div class="cont1">
       <hr/>
