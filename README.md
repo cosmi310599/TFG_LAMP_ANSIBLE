@@ -3,18 +3,18 @@
 <img src="https://miro.medium.com/max/1400/1*AEDJAyoOruXO7cckyvO_Gw.png" alt="ansible" width="500" align="center" />
 
 En este caso se ha empleado una Raspberry Pi con un S.O Ubuntu donde se ha realizado la instalación y configuración de ansible.
-Y una máquina cliente linux con distribución Debian donde se va a implantar el LAMP.
+Y un nodo gestionado linux con distribución Debian donde se va a implantar el LAMP.
 
 ### Pre-requisitos
 
 Software necesario para que funcione la implementación del servidor LAMP.
 
-Como el servidor de ansible esta implementado en una Raspberry Pi vamos a hacer uso de las imagenes oficiales de la página de Raspberry [https://www.raspberrypi.org/downloads/]
+Como el nodo de cotrol de ansible esta implementado en una Raspberry Pi vamos a hacer uso de las imagenes oficiales de la página de Raspberry [https://www.raspberrypi.org/downloads/]
 
 ```
 Ubuntu Server 20.04 LTS 
 ```
-Y en la máquina cliente necesitaremos una distribución Debian (o ubuntu)
+Y en el nodo gestionado necesitaremos una distribución Debian (o ubuntu)
 
 ```
 Debian 9.12
