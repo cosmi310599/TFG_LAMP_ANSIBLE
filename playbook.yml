@@ -1,4 +1,4 @@
-- hosts: clientes
+- hosts: lamp
   become: yes
   roles:
     - common
