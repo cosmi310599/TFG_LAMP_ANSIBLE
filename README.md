@@ -56,6 +56,8 @@ Introducimos la contraseña que en este caso es ```root``` y comenzará la ejecu
 
 
 -------------------------------------------------------------------------------------------------------------------------
+# Installing a LAMP sever with Ansible in a virtual machine.
+
 The implementation and configuration of a raspberry pi 3 will be carried out that will contain the ansible software to manage the different possible nodes that we will have at our disposal
 
 Software required for the LAMP server implementation to work.
