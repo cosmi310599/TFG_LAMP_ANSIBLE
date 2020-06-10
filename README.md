@@ -1,7 +1,5 @@
 # Instalación de un servidor LAMP con ANSIBLE en una máquina virtual.
 
-<img src="https://prezigram-assets.prezi.com/25f8f05f9bc162b1314d168cc6ba516c88b5b96b775380369cd7f61a70dbc55a122936abe711b0d796ba1b7c672ebc50e8faafe8fa44b90014f2829ed5d9886f" alt="ansible" width="650" align="center" />
-
 <p align="center">
   <img src="https://prezigram-assets.prezi.com/25f8f05f9bc162b1314d168cc6ba516c88b5b96b775380369cd7f61a70dbc55a122936abe711b0d796ba1b7c672ebc50e8faafe8fa44b90014f2829ed5d9886f" alt="ansible" width="650"/>
 </p>
