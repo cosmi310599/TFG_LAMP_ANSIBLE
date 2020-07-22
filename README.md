@@ -38,6 +38,9 @@ Instalamos ```openssh-server``` y editamos el siguiente fichero: ```/etc/ssh/ssh
 de ```PermitRootLogin``` y añadimos ```Yes``` a continuación.
 Reiniciamos el servicio haciendo un ```/etc/init.d/ssh restart``` o ```systemctl restart ssh```.
 
+## Importante 
+Aunque en este proyecto se realice todo con el usuario ```root``` es aconsejable realizar todas las operaciones posibles con un usuario que tenga el nivel de privilegios mas bajo por cuestión de seguridad y escalada de privilegios.
+
 
 ## Pasos para reaizar la conexión.
 Nos vamos al controlador donde tenemos Ansible instalado y ejecutamos el siguiente comando:
@@ -58,7 +61,7 @@ Introducimos la contraseña que en este caso es ```root``` y comenzará la ejecu
 -------------------------------------------------------------------------------------------------------------------------
 # Installing a LAMP sever with Ansible in a virtual machine.
 
-The implementation and configuration of a raspberry pi 3 will be carried out that will contain the ansible software to manage the different possible nodes that we will have at our disposal
+The implementation and configuration of a raspberry pi 3 will be carried out that will contain the ansible software to manage the different possible nodes that we will have at our disposal.
 
 Software required for the LAMP server implementation to work.
 
@@ -89,8 +92,10 @@ apt-get install ansible
 ## Steps to leave the node configured.
 We install ```openssh-server ``` and edit the following file: ``` / etc / ssh / sshd_config```, uncomment the line
 of ``` PermitRootLogin``` and add ``` Yes``` below.
-We restart the service by doing a ``` /etc/init.d/ssh restart```or ``` systemctl restart ssh```.
+We restart the service by doing a ``` /etc/init.d/ssh restart``` or ``` systemctl restart ssh```.
 
+## Important 
+Although in this project everything is done with the ```root``` user, it is advisable to carry out all possible operations with a user who has the lowest level of privileges for reasons of security and privilege escalation.
 
 ## Steps to make the connection.
 We go to the controller where we have Ansible installed and execute the following command:
