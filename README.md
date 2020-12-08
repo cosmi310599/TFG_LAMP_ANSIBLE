@@ -57,7 +57,7 @@ Nos situamos dentro de la carpeta ```tfg-lammp-ansible```  y ejecutamos el playb
 ```ansible-playbook playbook.yml --ask-vault-pass``` ya que tenemos una de las variabes cifrada y requiere contraseña para poder ser ejecutado.
 Introducimos la contraseña que en este caso es ```root``` y comenzará la ejecución del playbook.
 
-
+Link presentación: https://prezi.com/i/vmrbdcbcosw5/tfg/
 -------------------------------------------------------------------------------------------------------------------------
 # Installing a LAMP sever with Ansible in a virtual machine.
 
